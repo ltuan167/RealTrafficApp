@@ -20,10 +20,9 @@ export default class GpsSensor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: { lat: 0, lon: 0, speed: 0, timestamp: 0 },
+      data: { lat: 0, lon: 0, speed: 0},
     };
-    const timest = Date.now();
-
+    let timest = Date.now();
     file
       .mkdir(file.ExternalStorageDirectoryPath + '/TrafficData/GPS/' + timest)
       .then(success => {
@@ -37,47 +36,36 @@ export default class GpsSensor extends Component {
     this.gpsfileidx = 0;
   }
 
-  componentDidUpdate(prevState) {
-    // let { lat: prevLat, lon: prevLong, speed: prevSpd } = prevState.data;
-    // let { lat: newLat, lon: newLong, speed: newSpd } = this.state.data;
-    if (prevState.data && 
-       (prevLat !== newLat || 
-        prevLong !== newLong || 
-        prevSpd !== newSpd)) {
-          let time = moment(Date.now()).format('dddd DD-MM-YY hh:mm:ss');
-          this.gpsData.push(time);
-          this.gpsData.push(this.state.data);
-          console.log('Added new element in GPS array');
-    }
-    if (this.gpsData.length == 100) {
-      file
-        .writeFile(this.path + this.gpsfileidx + '.txt', JSON.stringify(this.gpsData), 'utf8')
-        .then(success => {
-          console.log('Successfully create gps file: ' + success);
-          this.gpsData = [];
-          this.gpsfileidx++;
-        })
-        .catch(error => {
-          console.log('Error: ' + error);
-        });
-    }
-  }
+  componentDidUpdate() {
 
+  }
+ 
   componentDidMount() {
-    setInterval(() => {
       Geolocation.watchPosition(
         position => {
-          // console.log(position);
-          // let t = position.timestamp;
-          // let tim = moment(t).format('dddd DD-MM-YY hh:mm:ss');
           this.setState({
             data: {
               lat: position.coords.latitude,
               lon: position.coords.longitude,
               speed: position.coords.speed * 3.6,
-              // timestamp: tim,
             },
           });
+          this.gpsData.push(this.state.data);
+          let timest = moment(Date.now()).format('dddd DD-MM-YY hh:mm:ss');
+          this.gpsData.push(timest);
+          console.log(this.gpsData.length);
+          if (this.gpsData.length == 100) {
+            file
+              .writeFile(this.path + this.gpsfileidx + '.txt', JSON.stringify(this.gpsData), 'utf8')
+              .then(success => {
+                console.log('Successfully create gps file: ' + success);
+                this.gpsData = [];
+                this.gpsfileidx++;
+              })
+              .catch(error => {
+                console.log('Error: ' + error);
+              });
+          }
         },
         error => console.log(error.code, error.message),
         {
@@ -88,7 +76,6 @@ export default class GpsSensor extends Component {
           distanceFilter: 0,
         },
       );
-    });
   }
 
   render() {

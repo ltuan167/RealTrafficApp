@@ -53,32 +53,33 @@ export default class AccSensor extends Component {
   componentDidUpdate(prevState) {
     // let {x: prevX, y: prevY, z: prevZ} = prevState.data
     // let {x: newX, y: newY, z: newZ} = this.state.data
-    if (prevState.data && 
-       (prevX !== newX ||
-        prevY !== newY ||
-        prevZ !== newZ)) {
-          let time = moment(Date.now()).format('dddd DD-MM-YY hh:mm:ss');
-          this.accelerometerData.push(time);
-          this.accelerometerData.push(this.state.data);
-          console.log('Added new element in Acc array ')          
-        } 
-    if (this.accelerometerData.length == 100) {
-      file
-        .writeFile(
-          this.path + this.accfileidx + '.txt', JSON.stringify(this.accelerometerData), 'utf8')
-        .then(success => {
-          console.log('Successfully create accelerometer file: ');
-          this.accelerometerData = [];
-          this.accfileidx++;
-        })
-        .catch(error => {
-          console.log('Error: ' + error);
-        });
-    }
+    // if (prevState.data && 
+    //    (prevX !== newX ||
+    //     prevY !== newY ||
+    //     prevZ !== newZ)) {
+                 
+    //     }
+    // let time = moment(Date.now()).format('dddd DD-MM-YY hh:mm:ss');
+    // this.accelerometerData.push(time);
+    // this.accelerometerData.push(this.state.data);
+    // // console.log('Added new element in Acc array ')   
+    // if (this.accelerometerData.length == 100) {
+    //   file
+    //     .writeFile(
+    //       this.path + this.accfileidx + '.txt', JSON.stringify(this.accelerometerData), 'utf8')
+    //     .then(success => {
+    //       console.log('Successfully create accelerometer file: ');
+    //       this.accelerometerData = [];
+    //       this.accfileidx++;
+    //     })
+    //     .catch(error => {
+    //       console.log('Error: ' + error);
+    //     });
+    // }
   }
 
   componentDidMount() {
-    accelerometer.subscribe(({x, y, z, timestamp}) => {
+    accelerometer.subscribe(({x, y, z}) => {
       // console.log(x, y, z);
       let a = (x + y + z) / 3;
       // let tim = moment(timestamp).format('dddd DD-MM-YY hh:mm:ss');
@@ -88,7 +89,7 @@ export default class AccSensor extends Component {
       }
     });
   }
-runvjierninerinvierni
+
   render() {
     return (
       <>
