@@ -14,7 +14,7 @@ import {
   PermissionsAndroid
 } from 'react-native';
 
-// import AccSensor from './component/accelerometer-sensor';
+import AccSensor from './component/accelerometer-sensor';
 import GpsSensor from './component/gps-sensor';
 import KeepAwake from 'react-native-keep-awake';
 
@@ -31,6 +31,7 @@ export default class App extends Component {
         <Text style={styles.headline}>I'm collecting some useful data for my thesis project (as shown below). Don't worry! Your personal data would not be collected. Thank you for your co.operation. I'm really appreciate it. </Text>
         {/* <AccSensor updateFunc = {(data) => this.setState({accSensor: data})}/> */}
         <GpsSensor/>
+        <AccSensor/>
         <KeepAwake/>
       </View>
     );

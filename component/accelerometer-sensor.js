@@ -27,7 +27,7 @@ export default class AccSensor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: {x: 0, y: 0, z: 0, a: 0, timestamp: 0},
+      data: {x: 0, y: 0, z: 0, a: 0},
     };
     setUpdateIntervalForType(SensorTypes.accelerometer, 100);
 
@@ -50,7 +50,7 @@ export default class AccSensor extends Component {
     this.listener = listener;
   }
 
-  componentDidUpdate(prevState) {
+  componentDidUpdate() {
     // let {x: prevX, y: prevY, z: prevZ} = prevState.data
     // let {x: newX, y: newY, z: newZ} = this.state.data
     // if (prevState.data && 
@@ -82,8 +82,26 @@ export default class AccSensor extends Component {
     accelerometer.subscribe(({x, y, z}) => {
       // console.log(x, y, z);
       let a = (x + y + z) / 3;
-      // let tim = moment(timestamp).format('dddd DD-MM-YY hh:mm:ss');
       this.setState({data: {x, y, z, a}});
+      
+      this.state.data["time"] = Date.now();
+      this.accelerometerData.push(this.state.data);
+      
+      console.log("Length of accelerometer data: " + this.accelerometerData.length);
+
+      if (this.accelerometerData.length == 100) {
+        file
+          .writeFile(
+            this.path + this.accfileidx + '.txt', JSON.stringify(this.accelerometerData), 'utf8')
+          .then(success => {
+            console.log('Successfully create accelerometer file: ');
+            this.accelerometerData = [];
+            this.accfileidx++;
+          })
+          .catch(error => {
+            console.log('Error: ' + error);
+          });
+      }
       if (this.props.updateFunc) {
         this.props.updateFunc({x, y, z, a});
       }

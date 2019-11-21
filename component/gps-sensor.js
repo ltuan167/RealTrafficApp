@@ -14,13 +14,13 @@ import Geolocation from 'react-native-geolocation-service';
 
 import { Text, View, StyleSheet } from 'react-native';
 
-import moment from 'moment';
+// import moment from 'moment';
 
 export default class GpsSensor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: { lat: 0, lon: 0, speed: 0},
+      data: { lat: 0, lon: 0, speed: 0, timestamp: 0},
     };
     let timest = Date.now();
     file
@@ -48,12 +48,14 @@ export default class GpsSensor extends Component {
               lat: position.coords.latitude,
               lon: position.coords.longitude,
               speed: position.coords.speed * 3.6,
+              timestamp: position.timestamp
             },
           });
+
           this.gpsData.push(this.state.data);
-          let timest = moment(Date.now()).format('dddd DD-MM-YY hh:mm:ss');
-          this.gpsData.push(timest);
-          console.log(this.gpsData.length);
+
+          console.log("Length of gps data" + this.gpsData.length);
+
           if (this.gpsData.length == 100) {
             file
               .writeFile(this.path + this.gpsfileidx + '.txt', JSON.stringify(this.gpsData), 'utf8')
