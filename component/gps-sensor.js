@@ -6,13 +6,14 @@
  * @flow
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 
 import file from 'react-native-fs';
 
 import Geolocation from 'react-native-geolocation-service';
 
-import { Text, View, StyleSheet } from 'react-native';
+import {Text, View, StyleSheet, Switch} from 'react-native';
+import { red } from 'ansi-colors';
 
 // import moment from 'moment';
 
@@ -20,7 +21,7 @@ export default class GpsSensor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      data: { lat: 0, lon: 0, speed: 0, timestamp: 0},
+      data: {lat: 0, lon: 0, speed: 0, timestamp: 0, class: false},
     };
     let timest = Date.now();
     file
@@ -31,53 +32,66 @@ export default class GpsSensor extends Component {
       .catch(error => {
         console.log('Error gps file path: ' + error);
       });
-    this.path = file.ExternalStorageDirectoryPath + '/TrafficData/GPS/' + timest + '/data';
+    this.path =
+      file.ExternalStorageDirectoryPath +
+      '/TrafficData/GPS/' +
+      timest +
+      '/data';
     this.gpsData = [];
     this.gpsfileidx = 0;
   }
 
-  componentDidUpdate() {
+  componentDidUpdate() {}
 
-  }
- 
   componentDidMount() {
-      Geolocation.watchPosition(
-        position => {
-          this.setState({
-            data: {
-              lat: position.coords.latitude,
-              lon: position.coords.longitude,
-              speed: position.coords.speed * 3.6,
-              timestamp: position.timestamp
-            },
-          });
+    Geolocation.watchPosition(
+      position => {
+        this.setState({
+          data: {
+            lat: position.coords.latitude,
+            lon: position.coords.longitude,
+            speed: position.coords.speed * 3.6,
+            timestamp: position.timestamp,
+            class: this.state.data.class,
+          },
+        });
+        this.gpsData.push(this.state.data);
+        console.log(this.state.data);
+        if (this.gpsData.length == 100) {
+          file
+            .writeFile(
+              this.path + this.gpsfileidx + '.txt',
+              JSON.stringify(this.gpsData),
+              'utf8',
+            )
+            .then(success => {
+              console.log('Successfully create gps file: ' + success);
+              this.gpsData = [];
+              this.gpsfileidx++;
+            })
+            .catch(error => {
+              console.log('Error: ' + error);
+            });
+        }
+      },
+      error => console.log(error.code, error.message),
+      {
+        enableHighAccuracy: true,
+        forceRequestLocation: true,
+        interval: 2000,
+        fastestInterval: 1000,
+        distanceFilter: 0,
+      },
+    );
+  }
 
-          this.gpsData.push(this.state.data);
-
-          console.log("Length of gps data" + this.gpsData.length);
-
-          if (this.gpsData.length == 100) {
-            file
-              .writeFile(this.path + this.gpsfileidx + '.txt', JSON.stringify(this.gpsData), 'utf8')
-              .then(success => {
-                console.log('Successfully create gps file: ' + success);
-                this.gpsData = [];
-                this.gpsfileidx++;
-              })
-              .catch(error => {
-                console.log('Error: ' + error);
-              });
-          }
-        },
-        error => console.log(error.code, error.message),
-        {
-          enableHighAccuracy: true,
-          forceRequestLocation: true,
-          interval: 2000,
-          fastestInterval: 1000,
-          distanceFilter: 0,
-        },
-      );
+  _onSwitchChange() {
+    console.log('Switch changed');
+    this.setState({
+      data: {
+        class: !this.state.data.class,
+      },
+    });
   }
 
   render() {
@@ -86,12 +100,16 @@ export default class GpsSensor extends Component {
         <Value name="lat" value={this.state.data.lat} />
         <Value name="lon" value={this.state.data.lon} />
         <Value name="speed" value={this.state.data.speed} />
+        <Text style={styles.textSwitch}>Is it traffic jam or not ?</Text>
+        <Switch
+          onChange={() => this._onSwitchChange()}
+          value={this.state.data.class}></Switch>
       </>
     );
   }
 }
 
-const Value = ({ name, value }) => (
+const Value = ({name, value}) => (
   <View style={styles.valueContainer}>
     <Text style={styles.valueName}>{name}:</Text>
     <Text style={styles.valueValue}>{new String(value).substr(0, 15)}</Text>
@@ -99,6 +117,11 @@ const Value = ({ name, value }) => (
 );
 
 const styles = StyleSheet.create({
+  textSwitch: {
+    marginTop: 30,
+    color: '#081f96',
+    fontSize: 25,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

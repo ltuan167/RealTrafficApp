@@ -14,7 +14,6 @@ import {
   SensorTypes,
 } from 'react-native-sensors';
 import file from 'react-native-fs';
-import moment from 'moment';
 
 const Value = ({name, value}) => (
   <View style={styles.valueContainer}>

@@ -7,32 +7,26 @@
  */
 
 import React, {Component} from 'react';
-import {
-  StyleSheet,
-  View,
-  Text,
-  PermissionsAndroid
-} from 'react-native';
+import {StyleSheet, View, PermissionsAndroid, Text} from 'react-native';
 
-import AccSensor from './component/accelerometer-sensor';
 import GpsSensor from './component/gps-sensor';
 import KeepAwake from 'react-native-keep-awake';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {accSensor: {x: 0, y:0, z: 0, a: 0}};
+    this.state = {accSensor: {x: 0, y: 0, z: 0, a: 0}};
     requestPermission();
   }
 
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.headline}>I'm collecting some useful data for my thesis project (as shown below). Don't worry! Your personal data would not be collected. Thank you for your co.operation. I'm really appreciate it. </Text>
+        <Text style={styles.headline}>Collect Data App 2.0</Text>
         {/* <AccSensor updateFunc = {(data) => this.setState({accSensor: data})}/> */}
-        <GpsSensor/>
-        <AccSensor/>
-        <KeepAwake/>
+        <GpsSensor />
+        {/* <AccSensor/> */}
+        <KeepAwake />
       </View>
     );
   }
@@ -41,11 +35,10 @@ export default class App extends Component {
 async function requestPermission() {
   try {
     const storageGranted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,          // writing on external storage permission
+      PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE, // writing on external storage permission
       {
         title: 'Write External storage permission',
-        message:
-          'We need permission to write to external storage',
+        message: 'We need permission to write to external storage',
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
@@ -57,11 +50,10 @@ async function requestPermission() {
       console.log('Write external storage permission denied');
     }
     const gpsGranted = await PermissionsAndroid.request(
-      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,             // location permission
+      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, // location permission
       {
         title: 'Cool GPS Permission',
-        message:
-          'Cool Photo App needs access to your GPS ',
+        message: 'Cool Photo App needs access to your GPS ',
         buttonNeutral: 'Ask Me Later',
         buttonNegative: 'Cancel',
         buttonPositive: 'OK',
@@ -85,10 +77,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   headline: {
-    fontSize: 20,
+    fontSize: 35,
     textAlign: 'center',
-    margin: 1,
-    color: 'red'
+    marginBottom: 50,
+    color: 'red',
   },
   valueContainer: {
     flexDirection: 'row',
@@ -96,12 +88,12 @@ const styles = StyleSheet.create({
   },
   valueValue: {
     width: 150,
-    fontSize: 20
+    fontSize: 20,
   },
   valueName: {
     width: 100,
     fontSize: 20,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
   instructions: {
     textAlign: 'center',
@@ -109,4 +101,3 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
-
